@@ -57,7 +57,7 @@ def check(req):
     read_xml_payloads()
 
     #检测原始的mark标记注入
-    if urllib.quote(SQLMARK) in req_info['data']:
+    if req_info['data'] and urllib.quote(SQLMARK) in req_info['data']:
         req_info['data'] = req_info['data'].replace(urllib.quote(SQLMARK), SQLMARK)
     if g_sql_info.check_mark_sql(req_info) == 1:
         return 1

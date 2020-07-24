@@ -31,7 +31,7 @@ TIMEOUT = 5
 SQLMARK = "@@"
 
 # server酱的api，用于微信告警 http://sc.ftqq.com/
-SERVER_JIANG_API = 'SCU91621T5a5a1585afb51c0854d090325c664c735e8053b1ad4ae'
+SERVER_JIANG_API = ''
 
 # 结果格式 -> 注入类型、数据库类型、url、参数、payload和数据包
 SQLI = '''
