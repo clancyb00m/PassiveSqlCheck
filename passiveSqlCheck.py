@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""
+问题：
+    1. 有的数据包并不能被解码
+    2. tratio < UPPER_RATIO_BOUND and fratio < UPPER_RATIO_BOUND的情况，也是有可能存在注入的
+更新：
+    保持数据包不变，取消解码
+"""
+
 import sys
 from func.check import check
 from conf.setting import *

@@ -164,8 +164,36 @@ def keywordreplace(value, payload):
     b'id=1REPLACE_VALUE'
     '''
 
+    # 找到retVal和payload的相同部分，如果相同部分大于payload的0.3，则从retVal中剔除
     retVal = value
-    if value and isinstance(value, bytes):
-        if payload and payload in retVal:
-            retVal = retVal.replace(payload, b'REFLECTED_VALUE')
+    if value and isinstance(value, unicode):
+        randomPayload, randomLength = LongSubString(retVal.replace('\\',''), payload.decode('utf-8'))
+        # 如果不判断，则会产生误报，比如都存在一个数字3 等极短的相似部分
+        if float(randomLength) / len(payload) > 0.3:
+            retVal = retVal.replace('\\','').replace(randomPayload, u'REFLECTED_VALUE')
     return retVal
+
+def LongSubString(s1, s2):
+    """
+    查找两个字符串中相同的最大字串
+    使用了滑动窗口的思想
+    """
+    MaxLength = 0  # 记录当前字串最大长度
+    MaxString = ''  # 记录当前最大字串
+    new1 = ''  # 第一个字符串的拼接子串
+    for v1 in s1:
+        new1 += v1
+        new2 = ''  # 第二个字符串的拼接子串
+        for v2 in s2:
+            new2 += v2
+            while len(new2) > len(new1):
+                # 当第二个字串的长度大于第一个字串时，则从第二个子串的第一个字符开始删除，直到两个子串长度相等
+                new2 = new2[1:]
+            if new2 == new1 and len(new2) > MaxLength:
+                # 当两个子串的内容相等且长度大于当前最大长度时就记录当前字符串并更新最大长度
+                MaxLength = len(new2)
+                MaxString = new2
+        if MaxString != new1:
+            # 内层循环完成后比较外层的子串与最大子串内容是否相同，不同时从外层子串的第一个字符开始删除
+            new1 = new1[1:]
+    return MaxString, MaxLength

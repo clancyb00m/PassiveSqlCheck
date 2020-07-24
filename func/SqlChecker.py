@@ -173,6 +173,8 @@ class SqlChecker:
                 self.reSend = 1
                 return 1
             else:
+                print(u'[-] 该payload不存在注入，程序继续执行')
+                self.reSend = 1
                 return 0
 
 
@@ -207,25 +209,20 @@ class SqlChecker:
                     pass
             else:
                 # 如果逻辑假与原始页面不相似，则有可能存在注入，再次发包进行判断
-                if self.reSend < 2:
-                    self.reSend += 1
-                    self.ratio = fratio
-                    print(u'[+] 可能存在注入，二次发包判断')
-                    if self.send_mark_sql(self.req_info, positiontype, self.repayload) == 1:
-                        return 1
-                else:
-                    print(u'这是去除标签后的结果，可能存在误报 SqlChecker.py # 定位：去标签比较')
-                    self.result_list.append({'type': 'boolean', 'dbms': self.payload_dbms, 'url': self.req_info['url'], 'param': self.param, 'payload': self.falsePayload, 'packet': self.req})
-                    # self.out_result()
-                    # exit()
+                self.reSend += 1
+                self.ratio = fratio
+                print(u'[+] 可能存在注入，二次发包判断')
+                if self.send_mark_sql(self.req_info, positiontype, self.repayload) == 1:
                     return 1
         else:
             # 逻辑真与原始页面不相似 或者 逻辑真与逻辑假完全相同，则进入这里，不存在注入，直接跳过
             # tratio < UPPER_RATIO_BOUND and fratio < UPPER_RATIO_BOUND
-            if tratio != fratio:
-                self.result_list.append({'type': 'boolean', 'dbms': self.payload_dbms, 'url': self.req_info['url'], 'param': self.param, 'payload': self.falsePayload, 'packet': self.req})
-                # self.out_result()
-                return 1
+            if tratio != fratio and abs(tratio - fratio) > 0.0000001:
+                self.reSend += 1
+                self.ratio = fratio
+                print(u'[+] 可能存在注入，二次发包判断')
+                if self.send_mark_sql(self.req_info, positiontype, self.repayload) == 1:
+                    return 1
 
     # 发送请求包，并判断注入
     def send_request(self,req_true_info,req_false_info,positiontype):
