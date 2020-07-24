@@ -167,10 +167,13 @@ def keywordreplace(value, payload):
     # 找到retVal和payload的相同部分，如果相同部分大于payload的0.3，则从retVal中剔除
     retVal = value
     if value and isinstance(value, unicode):
-        randomPayload, randomLength = LongSubString(retVal.replace('\\',''), payload.decode('utf-8'))
-        # 如果不判断，则会产生误报，比如都存在一个数字3 等极短的相似部分
-        if float(randomLength) / len(payload) > 0.3:
-            retVal = retVal.replace('\\','').replace(randomPayload, u'REFLECTED_VALUE')
+        if payload.decode('utf-8') in retVal.replace('\\',''):
+            retVal = retVal.replace('\\','').replace(payload.decode('utf-8'), u'REFLECTED_VALUE')
+        elif len(retVal) < 300:
+            randomPayload, randomLength = LongSubString(retVal.replace('\\',''), payload.decode('utf-8'))
+            # 如果不判断，则会产生误报，比如都存在一个数字3 等极短的相似部分
+            if float(randomLength) / len(payload) > 0.3:
+                retVal = retVal.replace('\\','').replace(randomPayload, u'REFLECTED_VALUE')
     return retVal
 
 def LongSubString(s1, s2):
