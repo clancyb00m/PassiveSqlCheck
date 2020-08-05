@@ -73,7 +73,10 @@ def parse_data(data):
     if '&' in data:
         per_data = data.split('&')
         for pdata in per_data:
-            quote_param_list.append(((pdata.split('=')[0]),(pdata.split('=')[1])))
+            try:
+                quote_param_list.append(((pdata.split('=')[0]),(pdata.split('=')[1])))
+            except:
+                quote_param_list.append((pdata, ''))
     else:
         quote_param_list.append(((data.split('=')[0]),(data.split('=')[1])))
 

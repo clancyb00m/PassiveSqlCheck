@@ -656,7 +656,7 @@ class SqlChecker:
             ranAny = strs[random.randint(0,61)] + strs[random.randint(0,61)] + strs[random.randint(0,61)] + strs[random.randint(0,61)]
             payload = payload.replace('$A', ranAny)
         if '$R1' in payload and '$R2' in payload:
-            if 'DECODE(INSTR' in payload:
+            if 'DECODE(INSTR' in payload or '||$R1/$R2||' in payload:
                 tpayload = payload
                 fpayload = payload.replace('$R2','0')
             else:
