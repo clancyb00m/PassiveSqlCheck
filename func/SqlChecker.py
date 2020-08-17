@@ -10,6 +10,7 @@ from boolInDepthJudge import *
 from parse import getUnicode
 import requests
 import sys
+import copy
 sys.dont_write_bytecode = True
 
 # Regular expression used for detecting multipart POST data
@@ -215,7 +216,7 @@ class SqlChecker:
                 if self.send_mark_sql(self.req_info, positiontype, self.repayload) == 1:
                     return 1
         else:
-            # 逻辑真与原始页面不相似 或者 逻辑真与逻辑假完全相同，则进入这里，不存在注入，直接跳过
+            # 逻辑真与原始页面不相似 或者 逻辑真与逻辑假完全相同，则进入这里
             # tratio < UPPER_RATIO_BOUND and fratio < UPPER_RATIO_BOUND
             if tratio != fratio and abs(tratio - fratio) > 0.0000001:
                 self.reSend += 1
@@ -369,6 +370,13 @@ class SqlChecker:
                         self.paramvalue = param.replace(SQLMARK, '')
                         break
             else:
+                # cookie
+                if ';' in sqlmark_site:
+                    sqlmark_site_list = sqlmark_site.split(';')
+                    for i in sqlmark_site_list:
+                        if SQLMARK in i:
+                            sqlmark_site = i.strip()
+                            break
                 self.param = re.search('(?:\?|&|)([^\?|&]*?)=(?:[^=]*?)'+SQLMARK, sqlmark_site).group(1)
                 self.paramvalue = re.search('=([^=]*?)'+SQLMARK, sqlmark_site).group(1)
         # # headers
@@ -463,8 +471,8 @@ class SqlChecker:
         # 替换随机值
         truePayload, falsePayload = self.getRandomPayload(payload)
         # 深拷贝
-        req_true_info = req_info.copy()
-        req_false_info = req_info.copy()
+        req_true_info = copy.deepcopy(req_info)
+        req_false_info = copy.deepcopy(req_info)
         self.falsePayload = falsePayload
         self.truePayload = truePayload
 
